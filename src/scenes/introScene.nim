@@ -3,8 +3,6 @@ import ../../lib/raylib
 import ../definitions
 import ../data
 
-import mainScene
-
 var
     introTimer: int = 5
     
@@ -14,7 +12,6 @@ proc introScene_init*(): void =
 proc introScene_update*(): void =
     if (introTimer - toInt(GetTime())) <= 0:
         currentScene = mainScn
-        mainScene_init()
         return
 
 proc introScene_draw*(): void =

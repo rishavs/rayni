@@ -5,8 +5,6 @@ import ../../lib/[
 import ../definitions
 import ../data
 
-import gameScene, settingsScene
-
 proc mainScene_init*(): void =
     echo "Initializing Main"
 
@@ -21,12 +19,10 @@ proc mainScene_draw*(): void =
     if GuiButton(Rectangle(x: 600, y: 300, width: 200, height: 50), "Start"):
         echo "clicked Start"
         currentScene = gameScn
-        gameScene_init()
 
     if GuiButton(Rectangle(x: 600, y: 400, width: 200, height: 50), "Settings"):
         echo "clicked Settings"
         currentScene = settingsScn
-        settingsScene_init()
 
     if GuiButton(Rectangle(x: 600, y: 500, width: 200, height: 50), "Exit"):
         CloseWindow()
