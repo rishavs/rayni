@@ -2,6 +2,7 @@ import ../../lib/[
     raylib,
     raygui]
 
+import ../definitions
 import ../data
 
 import gameScene, settingsScene

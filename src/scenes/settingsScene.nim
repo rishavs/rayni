@@ -1,5 +1,8 @@
-import ../../lib/raylib
+import ../../lib/[
+    raylib,
+    raygui]
 
+import ../definitions
 import ../data
 
 proc settingsScene_init*(): void =
@@ -12,6 +15,11 @@ proc settingsScene_draw*(): bool =
     BeginDrawing()
     ClearBackground RAYWHITE
     DrawText "Drawing Settings", 100, 100, 20, DARKGRAY
+
+    if GuiButton(Rectangle(x: 600, y: 400, width: 200, height: 50), "Settings"):
+        echo "clicked Settings"
+        currentScene = mainScn
+
     EndDrawing()
 
 proc settingsScene_cleanup*(): void =

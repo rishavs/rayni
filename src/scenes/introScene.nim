@@ -1,5 +1,6 @@
 import ../../lib/raylib
 
+import ../definitions
 import ../data
 
 import mainScene
