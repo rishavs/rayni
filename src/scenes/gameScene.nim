@@ -6,10 +6,10 @@ import ../data
 proc gameScene_init*(): void =
     echo "Initializing Game"
 
-proc gameScene_update*(): bool =
+proc gameScene_update*(): void =
     discard
 
-proc gameScene_draw*(): bool =
+proc gameScene_draw*(): void =
     BeginDrawing()
     ClearBackground RAYWHITE
     DrawText "FPS: " & $GetFPS(), 10, 10, 20, DARKGRAY

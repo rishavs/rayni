@@ -10,10 +10,10 @@ import gameScene, settingsScene
 proc mainScene_init*(): void =
     echo "Initializing Main"
 
-proc mainScene_update*(): bool =
+proc mainScene_update*(): void =
     discard
 
-proc mainScene_draw*(): bool =
+proc mainScene_draw*(): void =
     BeginDrawing()
     ClearBackground RAYWHITE
     DrawText "Drawing Main", 100, 100, 20, DARKGRAY

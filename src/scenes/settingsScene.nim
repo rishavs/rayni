@@ -8,10 +8,10 @@ import ../data
 proc settingsScene_init*(): void =
     echo "Initializing Settings"
 
-proc settingsScene_update*(): bool =
+proc settingsScene_update*(): void =
     discard
 
-proc settingsScene_draw*(): bool =
+proc settingsScene_draw*(): void =
     BeginDrawing()
     ClearBackground RAYWHITE
     DrawText "Drawing Settings", 100, 100, 20, DARKGRAY

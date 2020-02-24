@@ -14,9 +14,7 @@ import scenes/[
 #--------------------------------------------------------------------------------------
 # Initialization
 #--------------------------------------------------------------------------------------
-   
 InitWindow screenWidth, screenHeight, "Rayni Game"
-
 SetTargetFPS 60                  # Set our game to run at 60 frames-per-second
 
 currentScene = introScn
@@ -35,26 +33,26 @@ while not WindowShouldClose():    # Detect window close button or ESC key
         if sceneInit: 
             introScene_init()
             sceneInit = false
-        discard introScene_update()
-        discard introScene_draw()
+        introScene_update()
+        introScene_draw()
     of mainScn:
         if sceneInit: 
             mainScene_init()
             sceneInit = false
-        discard mainScene_update()
-        discard mainScene_draw()
+        mainScene_update()
+        mainScene_draw()
     of settingsScn:
         if sceneInit: 
             settingsScene_init()
             sceneInit = false
-        discard settingsScene_update()
-        discard settingsScene_draw()
+        settingsScene_update()
+        settingsScene_draw()
     of gameScn:
         if sceneInit: 
             gameScene_init()
             sceneInit = false
-        discard gameScene_update()
-        discard gameScene_draw()
+        gameScene_update()
+        gameScene_draw()
     #-----------------------------------------------------------------------------------
     #  Override Update
     # ----------------------------------------------------------------------------------

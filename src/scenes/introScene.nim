@@ -6,18 +6,18 @@ import ../data
 import mainScene
 
 var
-    introTimer: int = 3
+    introTimer: int = 5
     
 proc introScene_init*(): void =
     echo "Initializing Intro"
 
-proc introScene_update*(): bool =
+proc introScene_update*(): void =
     if (introTimer - toInt(GetTime())) <= 0:
         currentScene = mainScn
         mainScene_init()
-        return false
+        return
 
-proc introScene_draw*(): bool =
+proc introScene_draw*(): void =
     BeginDrawing()
     ClearBackground RAYWHITE
     DrawText("Drawing Intro", 100, 100, 20, DARKGRAY)
