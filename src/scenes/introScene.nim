@@ -1,21 +1,28 @@
 import ../../lib/raylib
 
-type
-    IntroScene* = ref object of RootObj
-        name*: string
+import ../data
 
-proc init*(self: IntroScene) =
-    self.name = "Intro Scene"
-    echo "Initializing " & self.name
+import mainScene
 
-proc update*(self: IntroScene) =
-    discard
+var
+    introTimer: int = 3
+    
+proc introScene_init*(): void =
+    echo "Initializing Intro"
 
-proc draw*(self: IntroScene) =
+proc introScene_update*(): bool =
+    if (introTimer - toInt(GetTime())) <= 0:
+        currentScene = mainScn
+        mainScene_init()
+        return false
+
+proc introScene_draw*(): bool =
     BeginDrawing()
     ClearBackground RAYWHITE
-    DrawText("Drawing INtro", 100, 100, 20, DARKGRAY)
+    DrawText("Drawing Intro", 100, 100, 20, DARKGRAY)
+
+    DrawText TextFormat("Timer: %i", introTimer - toInt(GetTime())), 100, 200, 20, RED
     EndDrawing()
 
-proc cleanup*(self: IntroScene) =
-    echo "Cleaning up " & self.name
+proc introScene_cleanup*(): void =
+    echo "Cleaning up Intro"

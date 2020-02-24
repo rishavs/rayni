@@ -2,27 +2,37 @@ import ../../lib/[
     raylib,
     raygui]
 
-type
-    MainScene* = ref object of RootObj
-        name*: string
+import ../data
 
-proc init*(self: MainScene) =
-    self.name = "Main Scene"
-    echo "Initializing " & self.name
+import gameScene, settingsScene
 
-proc update*(self: MainScene) =
+proc mainScene_init*(): void =
+    echo "Initializing Main"
+
+proc mainScene_update*(): bool =
     discard
 
-proc draw*(self: MainScene) =
+proc mainScene_draw*(): bool =
     BeginDrawing()
     ClearBackground RAYWHITE
-    DrawText "Drawing " & self.name, 100, 100, 20, DARKGRAY
+    DrawText "Drawing Main", 100, 100, 20, DARKGRAY
 
-    if GuiButton(Rectangle(x: 600, y: 320, width: 200, height: 50), "Start"):
-        # switchScene(mainScn)
-        echo "clicked btn"
+    if GuiButton(Rectangle(x: 600, y: 300, width: 200, height: 50), "Start"):
+        echo "clicked Start"
+        currentScene = gameScn
+        gameScene_init()
+
+    if GuiButton(Rectangle(x: 600, y: 400, width: 200, height: 50), "Settings"):
+        echo "clicked Settings"
+        currentScene = settingsScn
+        settingsScene_init()
+
+    if GuiButton(Rectangle(x: 600, y: 500, width: 200, height: 50), "Exit"):
+        CloseWindow()
+        quit(QuitSuccess)
+
 
     EndDrawing()
 
-proc cleanup*(self: MainScene) =
-    echo "Cleaning up " & self.name
+proc mainScene_cleanup*(): void =
+    echo "Cleaning up Main"

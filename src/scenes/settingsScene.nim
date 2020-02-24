@@ -1,21 +1,18 @@
 import ../../lib/raylib
 
-type
-    SettingsScene* = ref object of RootObj
-        name*: string
+import ../data
 
-proc init*(self: SettingsScene) =
-    self.name = "Settings Scene"
-    echo "Initializing " & self.name
+proc settingsScene_init*(): void =
+    echo "Initializing Settings"
 
-proc update*(self: SettingsScene) =
+proc settingsScene_update*(): bool =
     discard
 
-proc draw*(self: SettingsScene) =
+proc settingsScene_draw*(): bool =
     BeginDrawing()
     ClearBackground RAYWHITE
-    DrawText "Drawing " & self.name, 100, 100, 20, DARKGRAY
+    DrawText "Drawing Settings", 100, 100, 20, DARKGRAY
     EndDrawing()
 
-proc cleanup*(self: SettingsScene) =
-    echo "Cleaning up " & self.name
+proc settingsScene_cleanup*(): void =
+    echo "Cleaning up Settings"

@@ -1,7 +1,9 @@
 # import lenientops, math
 import ../lib/[
     raylib,
-    raygui]
+    ]
+
+import data
 
 import scenes/[
     introScene,
@@ -10,87 +12,40 @@ import scenes/[
     gameScene]
 
 #--------------------------------------------------------------------------------------
-# Declarations
-#--------------------------------------------------------------------------------------
-const screenWidth = 1600
-const screenHeight = 900
-
-type
-    Scenes = enum introScn, mainScn, settingsScn, gameScn
-
-var 
-    currentScene: Scenes
-
-proc switchScene*(scn: Scenes) =
-    # cleanup the current scene
-    case currentScene
-    of introScn:
-        IntroScene().cleanup()
-    of mainScn:
-        MainScene().cleanup()
-    of settingsScn:
-        SettingsScene().cleanup()
-    of gameScn:
-        GameScene().cleanup()
-
-    # init the new scene
-    case scn
-    of introScn:
-        IntroScene().init()
-    of mainScn:
-        MainScene().init()
-    of settingsScn:
-        SettingsScene().init()
-    of gameScn:
-        GameScene().init()
-
-    # set current scene
-    currentScene = scn
-    echo "-------------------------"
-
-#--------------------------------------------------------------------------------------
 # Initialization
 #--------------------------------------------------------------------------------------
-InitWindow screenWidth, screenHeight, "raylib [core] example - keyboard input"
+   
+InitWindow screenWidth, screenHeight, "Rayni Game"
 
-60.SetTargetFPS                   # Set our game to run at 60 frames-per-second
+SetTargetFPS 60                  # Set our game to run at 60 frames-per-second
 
-switchScene(introScn)
+currentScene = introScn
+introScene_init()
 
 #--------------------------------------------------------------------------------------
 # Main game loop
 #--------------------------------------------------------------------------------------
 while not WindowShouldClose():    # Detect window close button or ESC key
-    if KEY_ENTER.IsKeyPressed:       
-        case currentScene
-        of introScn:
-            switchScene(mainScn)
-        of mainScn:
-            switchScene(settingsScn)
-        of settingsScn:
-            switchScene(gameScn)
-        of gameScn:
-            switchScene(introScn)
-    
+   
     case currentScene
     of introScn:
-        IntroScene().update()
-        IntroScene().draw()
+        discard introScene_update()
+        discard introScene_draw()
     of mainScn:
-        MainScene().update()
-        MainScene().draw()
+        discard mainScene_update()
+        discard mainScene_draw()
     of settingsScn:
-        SettingsScene().update()
-        SettingsScene().draw()
+        discard settingsScene_update()
+        discard settingsScene_draw()
     of gameScn:
-        GameScene().update()
-        GameScene().draw()
+        discard gameScene_update()
+        discard gameScene_draw()
     #-----------------------------------------------------------------------------------
-    #  Update
+    #  Override Update
     # ----------------------------------------------------------------------------------
         
     # ----------------------------------------------------------------------------------
-    #  Draw
+    #  Override Draw
     # ----------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------
