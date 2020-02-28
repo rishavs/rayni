@@ -1,33 +1,38 @@
-# import lenientops, math
 import ../lib/[
     raylib,
     ]
 
-import definitions, data
+#--------------------------------------------------------------------------------------
+# Initialize engine
+#--------------------------------------------------------------------------------------
+InitWindow 1920, 1080, "Rayni Game"
+SetTargetFPS 60                  
+
+import defs
+
+#--------------------------------------------------------------------------------------
+# Initialize game logic
+#--------------------------------------------------------------------------------------
+
+currentScene    = introScn
+sceneInit       = true        
 
 import scenes/[
     introScene,
     mainScene,
     settingsScene,
-    gameScene]
-
-#--------------------------------------------------------------------------------------
-# Initialization
-#--------------------------------------------------------------------------------------
-InitWindow screenWidth, screenHeight, "Rayni Game"
-SetTargetFPS 60                  # Set our game to run at 60 frames-per-second
-
-currentScene = introScn
-sceneInit = true                 # flag to check if the scene has just been initiated
+    mapScene,
+    gameScene
+    ]
 
 #--------------------------------------------------------------------------------------
 # Main game loop
 #--------------------------------------------------------------------------------------
-while not WindowShouldClose():    # Detect window close button or ESC key
+while not WindowShouldClose():
 
-    #-----------------------------------------------------------------------------------
+    #----------------------------------------------------------------------------------
     #  Init, Update & draw Scene
-    # ----------------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------------
     case currentScene
     of introScn:
         if sceneInit: 
@@ -47,12 +52,19 @@ while not WindowShouldClose():    # Detect window close button or ESC key
             sceneInit = false
         settingsScene_update()
         settingsScene_draw()
+    of mapScn:
+        if sceneInit: 
+            mapScene_init()
+            sceneInit = false
+        mapScene_update()
+        mapScene_draw()
     of gameScn:
         if sceneInit: 
             gameScene_init()
             sceneInit = false
         gameScene_update()
         gameScene_draw()
+
     #-----------------------------------------------------------------------------------
     #  Override Update
     # ----------------------------------------------------------------------------------
@@ -61,8 +73,8 @@ while not WindowShouldClose():    # Detect window close button or ESC key
     #  Override Draw
     # ----------------------------------------------------------------------------------
 
-# ----------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 # De-Initialization
 # --------------------------------------------------------------------------------------
 
-CloseWindow()        #  Close window and OpenGL context
+CloseWindow()

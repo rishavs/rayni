@@ -1,5 +1,5 @@
 ﻿# 
-#   raygui v2.7-dev - A simple and easy-to-use immediate-mode gui library
+#   raygui v2.7 - A simple and easy-to-use immediate-mode gui library
 # 
 #   DESCRIPTION:
 # 
@@ -68,6 +68,7 @@
 # 
 # 
 #   VERSIONS HISTORY:
+#       2.7 (20-Feb-2020) Added possible tooltips API
 #       2.6 (09-Sep-2019) ADDED: GuiTextInputBox()
 #                         REDESIGNED: GuiListView*(), GuiDropdownBox(), GuiSlider*(), GuiProgressBar(), GuiMessageBox()
 #                         REVIEWED: GuiTextBox(), GuiSpinner(), GuiValueBox(), GuiLoadStyle()
@@ -283,7 +284,7 @@ converter GuiColorPickerProperty2int32* (self: GuiColorPickerProperty): int32 = 
 # ----------------------------------------------------------------------------------
 # Module Functions Declaration
 # ----------------------------------------------------------------------------------
-# Global gui modification functions
+# State modification functions
 proc GuiEnable*() {.RAYGUIDEF, importc: "GuiEnable".} # Enable gui controls (global state)
 proc GuiDisable*() {.RAYGUIDEF, importc: "GuiDisable".} # Disable gui controls (global state)
 proc GuiLock*() {.RAYGUIDEF, importc: "GuiLock".} # Lock gui controls (global state)
@@ -291,17 +292,23 @@ proc GuiUnlock*() {.RAYGUIDEF, importc: "GuiUnlock".} # Unlock gui controls (glo
 proc GuiFade*(alpha: float32) {.RAYGUIDEF, importc: "GuiFade".} # Set gui controls alpha (global state), alpha goes from 0.0f to 1.0f
 proc GuiSetState*(state: int32) {.RAYGUIDEF, importc: "GuiSetState".} # Set gui state (global state)
 proc GuiGetState*(): int32 {.RAYGUIDEF, importc: "GuiGetState".} # Get gui state (global state)
+# Font set/get functions
 proc GuiSetFont*(font: Font) {.RAYGUIDEF, importc: "GuiSetFont".} # Set gui custom font (global state)
 proc GuiGetFont*(): Font {.RAYGUIDEF, importc: "GuiGetFont".} # Get gui custom font (global state)
 # Style set/get functions
 proc GuiSetStyle*(control: int32; property: int32; value: int32) {.RAYGUIDEF, importc: "GuiSetStyle".} # Set one style property
 proc GuiGetStyle*(control: int32; property: int32): int32 {.RAYGUIDEF, importc: "GuiGetStyle".} # Get one style property
+# Tooltips set functions
+proc GuiEnableTooltip*() {.RAYGUIDEF, importc: "GuiEnableTooltip".} # Enable gui tooltips
+proc GuiDisableTooltip*() {.RAYGUIDEF, importc: "GuiDisableTooltip".} # Disable gui tooltips
+proc GuiSetTooltip*(tooltip: cstring) {.RAYGUIDEF, importc: "GuiSetTooltip".} # Set current tooltip for display
+proc GuiClearTooltip*() {.RAYGUIDEF, importc: "GuiClearTooltip".} # Clear any tooltip registered
 # Container/separator controls, useful for controls organization
 proc GuiWindowBox*(bounds: Rectangle; title: cstring): bool {.RAYGUIDEF, importc: "GuiWindowBox".} # Window Box control, shows a window that can be closed
 proc GuiGroupBox*(bounds: Rectangle; text: cstring) {.RAYGUIDEF, importc: "GuiGroupBox".} # Group Box control with text name
 proc GuiLine*(bounds: Rectangle; text: cstring) {.RAYGUIDEF, importc: "GuiLine".} # Line separator control, could contain text
 proc GuiPanel*(bounds: Rectangle) {.RAYGUIDEF, importc: "GuiPanel".} # Panel control, useful to group controls
-proc GuiScrollPanel*(bounds: Rectangle; content: Rectangle; scroll: Vector2): Rectangle {.RAYGUIDEF, importc: "GuiScrollPanel".} # Scroll Panel control
+proc GuiScrollPanel*(bounds: Rectangle; content: Rectangle; scroll: ptr Vector2): Rectangle {.RAYGUIDEF, importc: "GuiScrollPanel".} # Scroll Panel control
 # Basic controls set
 proc GuiLabel*(bounds: Rectangle; text: cstring) {.RAYGUIDEF, importc: "GuiLabel".} # Label control, shows text
 proc GuiButton*(bounds: Rectangle; text: cstring): bool {.RAYGUIDEF, importc: "GuiButton".} # Button control, returns true when clicked
@@ -315,8 +322,8 @@ proc GuiComboBox*(bounds: Rectangle; text: cstring; active: int32): int32 {.RAYG
 proc GuiDropdownBox*(bounds: Rectangle; text: cstring; active: int32; editMode: bool): bool {.RAYGUIDEF, importc: "GuiDropdownBox".} # Dropdown Box control, returns selected item
 proc GuiSpinner*(bounds: Rectangle; text: cstring; value: int32; minValue: int32; maxValue: int32; editMode: bool): bool {.RAYGUIDEF, importc: "GuiSpinner".} # Spinner control, returns selected value
 proc GuiValueBox*(bounds: Rectangle; text: cstring; value: int32; minValue: int32; maxValue: int32; editMode: bool): bool {.RAYGUIDEF, importc: "GuiValueBox".} # Value Box control, updates input text with numbers
-proc GuiTextBox*(bounds: Rectangle; text: char; textSize: int32; editMode: bool): bool {.RAYGUIDEF, importc: "GuiTextBox".} # Text Box control, updates input text
-proc GuiTextBoxMulti*(bounds: Rectangle; text: char; textSize: int32; editMode: bool): bool {.RAYGUIDEF, importc: "GuiTextBoxMulti".} # Text Box control with multiple lines
+proc GuiTextBox*(bounds: Rectangle; text: ptr char; textSize: int32; editMode: bool): bool {.RAYGUIDEF, importc: "GuiTextBox".} # Text Box control, updates input text
+proc GuiTextBoxMulti*(bounds: Rectangle; text: ptr char; textSize: int32; editMode: bool): bool {.RAYGUIDEF, importc: "GuiTextBoxMulti".} # Text Box control with multiple lines
 proc GuiSlider*(bounds: Rectangle; textLeft: cstring; textRight: cstring; value: float32; minValue: float32; maxValue: float32): float32 {.RAYGUIDEF, importc: "GuiSlider".} # Slider control, returns selected value
 proc GuiSliderBar*(bounds: Rectangle; textLeft: cstring; textRight: cstring; value: float32; minValue: float32; maxValue: float32): float32 {.RAYGUIDEF, importc: "GuiSliderBar".} # Slider Bar control, returns selected value
 proc GuiProgressBar*(bounds: Rectangle; textLeft: cstring; textRight: cstring; value: float32; minValue: float32; maxValue: float32): float32 {.RAYGUIDEF, importc: "GuiProgressBar".} # Progress Bar control, shows current progress value
@@ -328,7 +335,7 @@ proc GuiGrid*(bounds: Rectangle; spacing: float32; subdivs: int32): Vector2 {.RA
 proc GuiListView*(bounds: Rectangle; text: cstring; scrollIndex: int32; active: int32): int32 {.RAYGUIDEF, importc: "GuiListView".} # List View control, returns selected list item index
 proc GuiListViewEx*(bounds: Rectangle; text: cstring; count: int32; focus: int32; scrollIndex: int32; active: int32): int32 {.RAYGUIDEF, importc: "GuiListViewEx".} # List View with extended parameters
 proc GuiMessageBox*(bounds: Rectangle; title: cstring; message: cstring; buttons: cstring): int32 {.RAYGUIDEF, importc: "GuiMessageBox".} # Message Box control, displays a message
-proc GuiTextInputBox*(bounds: Rectangle; title: cstring; message: cstring; buttons: cstring; text: char): int32 {.RAYGUIDEF, importc: "GuiTextInputBox".} # Text Input Box control, ask for text
+proc GuiTextInputBox*(bounds: Rectangle; title: cstring; message: cstring; buttons: cstring; text: ptr char): int32 {.RAYGUIDEF, importc: "GuiTextInputBox".} # Text Input Box control, ask for text
 proc GuiColorPicker*(bounds: Rectangle; color: Color): Color {.RAYGUIDEF, importc: "GuiColorPicker".} # Color Picker control
 # Styles loading functions
 proc GuiLoadStyle*(fileName: cstring) {.RAYGUIDEF, importc: "GuiLoadStyle".} # Load style file (.rgs)

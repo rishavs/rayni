@@ -56,7 +56,7 @@
 #     3. This notice may not be removed or altered from any source distribution.
 # 
 template RLGL_H*(): auto = RLGL_H
-{.pragma: RLAPI, cdecl, discardable, dynlib: "rlgl" & LEXT.}
+{.pragma: RLAPI, cdecl, discardable, dynlib: "libraylib" & LEXT.}
 import raylib
 # Security check in case no GRAPHICS_API_OPENGL_* defined
 # Security check in case multiple GRAPHICS_API_OPENGL_* defined
@@ -168,7 +168,7 @@ proc rlLoadTextureCubemap*(data: pointer; size: int32; format: int32): uint32 {.
 proc rlUpdateTexture*(id: uint32; width: int32; height: int32; format: int32; data: pointer) {.RLAPI, importc: "rlUpdateTexture".} # Update GPU texture with new data
 proc rlGetGlTextureFormats*(format: int32; glInternalFormat: uint32; glFormat: uint32; glType: uint32) {.RLAPI, importc: "rlGetGlTextureFormats".} # Get OpenGL internal formats
 proc rlUnloadTexture*(id: uint32) {.RLAPI, importc: "rlUnloadTexture".} # Unload texture from GPU memory
-proc rlGenerateMipmaps*(texture: Texture2D) {.RLAPI, importc: "rlGenerateMipmaps".} # Generate mipmap data for selected texture
+proc rlGenerateMipmaps*(texture: ptr Texture2D) {.RLAPI, importc: "rlGenerateMipmaps".} # Generate mipmap data for selected texture
 proc rlReadTexturePixels*(texture: Texture2D): pointer {.RLAPI, importc: "rlReadTexturePixels".} # Read texture pixel data
 proc rlReadScreenPixels*(width: int32; height: int32): uint8 {.RLAPI, importc: "rlReadScreenPixels".} # Read screen pixel data (color buffer)
 # Render texture management (fbo)
@@ -176,7 +176,7 @@ proc rlLoadRenderTexture*(width: int32; height: int32; format: int32; depthBits:
 proc rlRenderTextureAttach*(target: RenderTexture; id: uint32; attachType: int32) {.RLAPI, importc: "rlRenderTextureAttach".} # Attach texture/renderbuffer to an fbo
 proc rlRenderTextureComplete*(target: RenderTexture): bool {.RLAPI, importc: "rlRenderTextureComplete".} # Verify render texture is complete
 # Vertex data management
-proc rlLoadMesh*(mesh: Mesh; dynamic: bool) {.RLAPI, importc: "rlLoadMesh".} # Upload vertex data into GPU and provided VAO/VBO ids
+proc rlLoadMesh*(mesh: ptr Mesh; dynamic: bool) {.RLAPI, importc: "rlLoadMesh".} # Upload vertex data into GPU and provided VAO/VBO ids
 proc rlUpdateMesh*(mesh: Mesh; buffer: int32; num: int32) {.RLAPI, importc: "rlUpdateMesh".} # Update vertex or index data on GPU (upload new data to one buffer)
 proc rlUpdateMeshAt*(mesh: Mesh; buffer: int32; num: int32; index: int32) {.RLAPI, importc: "rlUpdateMeshAt".} # Update vertex or index data on GPU, at index
 proc rlDrawMesh*(mesh: Mesh; material: Material; transform: Matrix) {.RLAPI, importc: "rlDrawMesh".} # Draw a 3d mesh with material and transform
@@ -188,7 +188,7 @@ proc rlUnloadMesh*(mesh: Mesh) {.RLAPI, importc: "rlUnloadMesh".} # Unload mesh 
 # NOTE: This functions are useless when using OpenGL 1.1
 # ------------------------------------------------------------------------------------
 # Shader loading/unloading functions
-proc LoadText*(fileName: cstring): char {.RLAPI, importc: "LoadText".} # Load chars array from text file
+proc LoadText*(fileName: cstring): ptr char {.RLAPI, importc: "LoadText".} # Load chars array from text file
 proc LoadShader*(vsFileName: cstring; fsFileName: cstring): Shader {.RLAPI, importc: "LoadShader".} # Load shader from files and bind default locations
 proc LoadShaderCode*(vsCode: cstring; fsCode: cstring): Shader {.RLAPI, importc: "LoadShaderCode".} # Load shader from code strings and bind default locations
 proc UnloadShader*(shader: Shader) {.RLAPI, importc: "UnloadShader".} # Unload shader from GPU memory (VRAM)
@@ -218,13 +218,12 @@ proc EndBlendMode*() {.RLAPI, importc: "EndBlendMode".} # End blending mode (res
 # VR control functions
 proc InitVrSimulator*() {.RLAPI, importc: "InitVrSimulator".} # Init VR simulator for selected device parameters
 proc CloseVrSimulator*() {.RLAPI, importc: "CloseVrSimulator".} # Close VR simulator for current device
-proc UpdateVrTracking*(camera: Camera) {.RLAPI, importc: "UpdateVrTracking".} # Update VR tracking (position and orientation) and camera
+proc UpdateVrTracking*(camera: ptr Camera) {.RLAPI, importc: "UpdateVrTracking".} # Update VR tracking (position and orientation) and camera
 proc SetVrConfiguration*(info: VrDeviceInfo; distortion: Shader) {.RLAPI, importc: "SetVrConfiguration".} # Set stereo rendering configuration parameters
 proc IsVrSimulatorReady*(): bool {.RLAPI, importc: "IsVrSimulatorReady".} # Detect if VR simulator is ready
 proc ToggleVrMode*() {.RLAPI, importc: "ToggleVrMode".} # Enable/Disable VR experience
 proc BeginVrDrawing*() {.RLAPI, importc: "BeginVrDrawing".} # Begin VR simulator stereo rendering
 proc EndVrDrawing*() {.RLAPI, importc: "EndVrDrawing".} # End VR simulator stereo rendering
-proc TRACELOG*(msgType: int32; text: cstring) {.RLAPI, varargs, importc: "TRACELOG".} # Show trace log messages (LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_DEBUG)
 proc GetPixelDataSize*(width: int32; height: int32; format: int32): int32 {.RLAPI, importc: "GetPixelDataSize".} # Get pixel data size in bytes (image or texture)
 # 
 #   RLGL IMPLEMENTATION

@@ -1,7 +1,6 @@
 import ../../lib/raylib
 
-import ../definitions
-import ../data
+import ../defs
 
 proc gameScene_init*(): void =
     echo "Initializing Game"

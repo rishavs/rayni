@@ -202,8 +202,8 @@ type Font* = object
     baseSize*: int32 # Base size (default chars height)
     charsCount*: int32 # Number of characters
     texture*: Texture2D # Characters texture atlas
-    recs*: Rectangle # Characters rectangles in texture
-    chars*: CharInfo # Characters info data
+    recs*: ptr Rectangle # Characters rectangles in texture
+    chars*: ptr CharInfo # Characters info data
 template SpriteFont*(): auto = Font
 # Camera type, defines a camera position/orientation in 3d space
 type Camera3D* = object
@@ -249,7 +249,7 @@ type MaterialMap* = object
 # Material type (generic)
 type Material* = object
     shader*: Shader # Material shader
-    maps*: MaterialMap # Material maps array (MAX_MATERIAL_MAPS)
+    maps*: ptr MaterialMap # Material maps array (MAX_MATERIAL_MAPS)
     params*: float32 # Material generic parameters (if required)
 # Transformation properties
 type Transform* = object
@@ -264,19 +264,19 @@ type BoneInfo* = object
 type Model* = object
     transform*: Matrix # Local transform matrix
     meshCount*: int32 # Number of meshes
-    meshes*: Mesh # Meshes array
+    meshes*: ptr Mesh # Meshes array
     materialCount*: int32 # Number of materials
-    materials*: Material # Materials array
+    materials*: ptr Material # Materials array
     meshMaterial*: int32 # Mesh material number
     boneCount*: int32 # Number of bones
-    bones*: BoneInfo # Bones information (skeleton)
-    bindPose*: Transform # Bones base transformation (pose)
+    bones*: ptr BoneInfo # Bones information (skeleton)
+    bindPose*: ptr Transform # Bones base transformation (pose)
 # Model animation
 type ModelAnimation* = object
     boneCount*: int32 # Number of bones
-    bones*: BoneInfo # Bones information (skeleton)
+    bones*: ptr BoneInfo # Bones information (skeleton)
     frameCount*: int32 # Number of animation frames
-    framePoses*: Transform # Poses array by frame
+    framePoses*: ptr Transform # Poses array by frame
 # Ray type (useful for raycast)
 type Ray* = object
     position*: Vector3 # Ray position (origin)
@@ -305,7 +305,7 @@ type AudioStream* = object
     sampleRate*: uint32 # Frequency (samples per second)
     sampleSize*: uint32 # Bit depth (bits per sample): 8, 16, 32 (24 not supported)
     channels*: uint32 # Number of channels (1-mono, 2-stereo)
-    buffer*: rAudioBuffer # Pointer to internal data used by the audio system
+    buffer*: ptr rAudioBuffer # Pointer to internal data used by the audio system
 # Sound source type
 type Sound* = object
     sampleCount*: uint32 # Total number of samples
@@ -756,6 +756,8 @@ proc TraceLog*(logType: int32; text: cstring) {.RLAPI, varargs, importc: "TraceL
 proc TakeScreenshot*(fileName: cstring) {.RLAPI, importc: "TakeScreenshot".} # Takes a screenshot of current screen (saved a .png)
 proc GetRandomValue*(min: int32; max: int32): int32 {.RLAPI, importc: "GetRandomValue".} # Returns a random value between min and max (both included)
 # Files management functions
+proc LoadFileData*(fileName: cstring; bytesRead: int32): uint8 {.RLAPI, importc: "LoadFileData".} # Load file data as byte array (read)
+proc SaveFileData*(fileName: cstring; data: pointer; bytesToWrite: int32) {.RLAPI, importc: "SaveFileData".} # Save data to file from byte array (write)
 proc FileExists*(fileName: cstring): bool {.RLAPI, importc: "FileExists".} # Check if file exists
 proc IsFileExtension*(fileName: cstring; ext: cstring): bool {.RLAPI, importc: "IsFileExtension".} # Check file extension
 proc DirectoryExists*(dirPath: cstring): bool {.RLAPI, importc: "DirectoryExists".} # Check if a directory path exists
@@ -765,18 +767,18 @@ proc GetFileNameWithoutExt*(filePath: cstring): cstring {.RLAPI, importc: "GetFi
 proc GetDirectoryPath*(filePath: cstring): cstring {.RLAPI, importc: "GetDirectoryPath".} # Get full path for a given fileName with path (uses static string)
 proc GetPrevDirectoryPath*(dirPath: cstring): cstring {.RLAPI, importc: "GetPrevDirectoryPath".} # Get previous directory path for a given path (uses static string)
 proc GetWorkingDirectory*(): cstring {.RLAPI, importc: "GetWorkingDirectory".} # Get current working directory (uses static string)
-proc GetDirectoryFiles*(dirPath: cstring; count: int32): char {.RLAPI, importc: "GetDirectoryFiles".} # Get filenames in a directory path (memory should be freed)
+proc GetDirectoryFiles*(dirPath: cstring; count: int32): ptr char {.RLAPI, importc: "GetDirectoryFiles".} # Get filenames in a directory path (memory should be freed)
 proc ClearDirectoryFiles*() {.RLAPI, importc: "ClearDirectoryFiles".} # Clear directory files paths buffers (free memory)
 proc ChangeDirectory*(dir: cstring): bool {.RLAPI, importc: "ChangeDirectory".} # Change working directory, returns true if success
 proc IsFileDropped*(): bool {.RLAPI, importc: "IsFileDropped".} # Check if a file has been dropped into window
-proc GetDroppedFiles*(count: int32): char {.RLAPI, importc: "GetDroppedFiles".} # Get dropped files names (memory should be freed)
+proc GetDroppedFiles*(count: int32): ptr char {.RLAPI, importc: "GetDroppedFiles".} # Get dropped files names (memory should be freed)
 proc ClearDroppedFiles*() {.RLAPI, importc: "ClearDroppedFiles".} # Clear dropped files paths buffer (free memory)
 proc GetFileModTime*(fileName: cstring): int32 {.RLAPI, importc: "GetFileModTime".} # Get file modification time (last write time)
 proc CompressData*(data: uint8; dataLength: int32; compDataLength: int32): uint8 {.RLAPI, importc: "CompressData".} # Compress data (DEFLATE algorythm)
 proc DecompressData*(compData: uint8; compDataLength: int32; dataLength: int32): uint8 {.RLAPI, importc: "DecompressData".} # Decompress data (DEFLATE algorythm)
 # Persistent storage management
-proc StorageSaveValue*(position: int32; value: int32) {.RLAPI, importc: "StorageSaveValue".} # Save integer value to storage file (to defined position)
-proc StorageLoadValue*(position: int32): int32 {.RLAPI, importc: "StorageLoadValue".} # Load integer value from storage file (from defined position)
+proc SaveStorageValue*(position: int32; value: int32) {.RLAPI, importc: "SaveStorageValue".} # Save integer value to storage file (to defined position)
+proc LoadStorageValue*(position: int32): int32 {.RLAPI, importc: "LoadStorageValue".} # Load integer value from storage file (from defined position)
 proc OpenURL*(url: cstring) {.RLAPI, importc: "OpenURL".} # Open URL with default system browser (if available)
 # ------------------------------------------------------------------------------------
 # Input Handling Functions (Module: core)
@@ -831,7 +833,7 @@ proc GetGesturePinchAngle*(): float32 {.RLAPI, importc: "GetGesturePinchAngle".}
 # Camera System Functions (Module: camera)
 # ------------------------------------------------------------------------------------
 proc SetCameraMode*(camera: Camera; mode: int32) {.RLAPI, importc: "SetCameraMode".} # Set camera mode (multiple camera modes available)
-proc UpdateCamera*(camera: Camera) {.RLAPI, importc: "UpdateCamera".} # Update camera position for selected mode
+proc UpdateCamera*(camera: ptr Camera) {.RLAPI, importc: "UpdateCamera".} # Update camera position for selected mode
 proc SetCameraPanControl*(panKey: int32) {.RLAPI, importc: "SetCameraPanControl".} # Set camera pan key to combine with mouse movement (free camera)
 proc SetCameraAltControl*(altKey: int32) {.RLAPI, importc: "SetCameraAltControl".} # Set camera alt key to combine with mouse movement (free camera)
 proc SetCameraSmoothZoomControl*(szKey: int32) {.RLAPI, importc: "SetCameraSmoothZoomControl".} # Set camera smooth zoom key to combine with mouse (free camera)
@@ -846,7 +848,7 @@ proc DrawLine*(startPosX: int32; startPosY: int32; endPosX: int32; endPosY: int3
 proc DrawLineV*(startPos: Vector2; endPos: Vector2; color: Color) {.RLAPI, importc: "DrawLineV".} # Draw a line (Vector version)
 proc DrawLineEx*(startPos: Vector2; endPos: Vector2; thick: float32; color: Color) {.RLAPI, importc: "DrawLineEx".} # Draw a line defining thickness
 proc DrawLineBezier*(startPos: Vector2; endPos: Vector2; thick: float32; color: Color) {.RLAPI, importc: "DrawLineBezier".} # Draw a line using cubic-bezier curves in-out
-proc DrawLineStrip*(points: Vector2; numPoints: int32; color: Color) {.RLAPI, importc: "DrawLineStrip".} # Draw lines sequence
+proc DrawLineStrip*(points: ptr Vector2; numPoints: int32; color: Color) {.RLAPI, importc: "DrawLineStrip".} # Draw lines sequence
 proc DrawCircle*(centerX: int32; centerY: int32; radius: float32; color: Color) {.RLAPI, importc: "DrawCircle".} # Draw a color-filled circle
 proc DrawCircleSector*(center: Vector2; radius: float32; startAngle: int32; endAngle: int32; segments: int32; color: Color) {.RLAPI, importc: "DrawCircleSector".} # Draw a piece of a circle
 proc DrawCircleSectorLines*(center: Vector2; radius: float32; startAngle: int32; endAngle: int32; segments: int32; color: Color) {.RLAPI, importc: "DrawCircleSectorLines".} # Draw circle sector outline
@@ -870,8 +872,8 @@ proc DrawRectangleRounded*(rec: Rectangle; roundness: float32; segments: int32; 
 proc DrawRectangleRoundedLines*(rec: Rectangle; roundness: float32; segments: int32; lineThick: int32; color: Color) {.RLAPI, importc: "DrawRectangleRoundedLines".} # Draw rectangle with rounded edges outline
 proc DrawTriangle*(v1: Vector2; v2: Vector2; v3: Vector2; color: Color) {.RLAPI, importc: "DrawTriangle".} # Draw a color-filled triangle (vertex in counter-clockwise order!)
 proc DrawTriangleLines*(v1: Vector2; v2: Vector2; v3: Vector2; color: Color) {.RLAPI, importc: "DrawTriangleLines".} # Draw triangle outline (vertex in counter-clockwise order!)
-proc DrawTriangleFan*(points: Vector2; numPoints: int32; color: Color) {.RLAPI, importc: "DrawTriangleFan".} # Draw a triangle fan defined by points (first vertex is the center)
-proc DrawTriangleStrip*(points: Vector2; pointsCount: int32; color: Color) {.RLAPI, importc: "DrawTriangleStrip".} # Draw a triangle strip defined by points
+proc DrawTriangleFan*(points: ptr Vector2; numPoints: int32; color: Color) {.RLAPI, importc: "DrawTriangleFan".} # Draw a triangle fan defined by points (first vertex is the center)
+proc DrawTriangleStrip*(points: ptr Vector2; pointsCount: int32; color: Color) {.RLAPI, importc: "DrawTriangleStrip".} # Draw a triangle strip defined by points
 proc DrawPoly*(center: Vector2; sides: int32; radius: float32; rotation: float32; color: Color) {.RLAPI, importc: "DrawPoly".} # Draw a regular polygon (Vector version)
 proc DrawPolyLines*(center: Vector2; sides: int32; radius: float32; rotation: float32; color: Color) {.RLAPI, importc: "DrawPolyLines".} # Draw a polygon outline of n sides
 # Basic shapes collision detection functions
@@ -887,7 +889,7 @@ proc CheckCollisionPointTriangle*(point: Vector2; p1: Vector2; p2: Vector2; p3: 
 # ------------------------------------------------------------------------------------
 # Image/Texture2D data loading/unloading/saving functions
 proc LoadImage*(fileName: cstring): Image {.RLAPI, importc: "LoadImage".} # Load image from file into CPU memory (RAM)
-proc LoadImageEx*(pixels: Color; width: int32; height: int32): Image {.RLAPI, importc: "LoadImageEx".} # Load image from Color array data (RGBA - 32bit)
+proc LoadImageEx*(pixels: ptr Color; width: int32; height: int32): Image {.RLAPI, importc: "LoadImageEx".} # Load image from Color array data (RGBA - 32bit)
 proc LoadImagePro*(data: pointer; width: int32; height: int32; format: int32): Image {.RLAPI, importc: "LoadImagePro".} # Load image from raw data with parameters
 proc LoadImageRaw*(fileName: cstring; width: int32; height: int32; format: int32; headerSize: int32): Image {.RLAPI, importc: "LoadImageRaw".} # Load image from RAW file data
 proc ExportImage*(image: Image; fileName: cstring) {.RLAPI, importc: "ExportImage".} # Export image data to file
@@ -899,8 +901,8 @@ proc LoadRenderTexture*(width: int32; height: int32): RenderTexture2D {.RLAPI, i
 proc UnloadImage*(image: Image) {.RLAPI, importc: "UnloadImage".} # Unload image from CPU memory (RAM)
 proc UnloadTexture*(texture: Texture2D) {.RLAPI, importc: "UnloadTexture".} # Unload texture from GPU memory (VRAM)
 proc UnloadRenderTexture*(target: RenderTexture2D) {.RLAPI, importc: "UnloadRenderTexture".} # Unload render texture from GPU memory (VRAM)
-proc GetImageData*(image: Image): Color {.RLAPI, importc: "GetImageData".} # Get pixel data from image as a Color struct array
-proc GetImageDataNormalized*(image: Image): Vector4 {.RLAPI, importc: "GetImageDataNormalized".} # Get pixel data from image as Vector4 array (float normalized)
+proc GetImageData*(image: Image): ptr Color {.RLAPI, importc: "GetImageData".} # Get pixel data from image as a Color struct array
+proc GetImageDataNormalized*(image: Image): ptr Vector4 {.RLAPI, importc: "GetImageDataNormalized".} # Get pixel data from image as Vector4 array (float normalized)
 proc GetImageAlphaBorder*(image: Image; threshold: float32): Rectangle {.RLAPI, importc: "GetImageAlphaBorder".} # Get image alpha border rectangle
 proc GetPixelDataSize*(width: int32; height: int32; format: int32): int32 {.RLAPI, importc: "GetPixelDataSize".} # Get pixel data size in bytes (image or texture)
 proc GetTextureData*(texture: Texture2D): Image {.RLAPI, importc: "GetTextureData".} # Get pixel data from GPU texture and return an Image
@@ -909,36 +911,36 @@ proc UpdateTexture*(texture: Texture2D; pixels: pointer) {.RLAPI, importc: "Upda
 # Image manipulation functions
 proc ImageCopy*(image: Image): Image {.RLAPI, importc: "ImageCopy".} # Create an image duplicate (useful for transformations)
 proc ImageFromImage*(image: Image; rec: Rectangle): Image {.RLAPI, importc: "ImageFromImage".} # Create an image from another image piece
-proc ImageToPOT*(image: Image; fillColor: Color) {.RLAPI, importc: "ImageToPOT".} # Convert image to POT (power-of-two)
-proc ImageFormat*(image: Image; newFormat: int32) {.RLAPI, importc: "ImageFormat".} # Convert image data to desired format
-proc ImageAlphaMask*(image: Image; alphaMask: Image) {.RLAPI, importc: "ImageAlphaMask".} # Apply alpha mask to image
-proc ImageAlphaClear*(image: Image; color: Color; threshold: float32) {.RLAPI, importc: "ImageAlphaClear".} # Clear alpha channel to desired color
-proc ImageAlphaCrop*(image: Image; threshold: float32) {.RLAPI, importc: "ImageAlphaCrop".} # Crop image depending on alpha value
-proc ImageAlphaPremultiply*(image: Image) {.RLAPI, importc: "ImageAlphaPremultiply".} # Premultiply alpha channel
-proc ImageCrop*(image: Image; crop: Rectangle) {.RLAPI, importc: "ImageCrop".} # Crop an image to a defined rectangle
-proc ImageResize*(image: Image; newWidth: int32; newHeight: int32) {.RLAPI, importc: "ImageResize".} # Resize image (Bicubic scaling algorithm)
-proc ImageResizeNN*(image: Image; newWidth: int32; newHeight: int32) {.RLAPI, importc: "ImageResizeNN".} # Resize image (Nearest-Neighbor scaling algorithm)
-proc ImageResizeCanvas*(image: Image; newWidth: int32; newHeight: int32; offsetX: int32; offsetY: int32; color: Color) {.RLAPI, importc: "ImageResizeCanvas".} # Resize canvas and fill with color
-proc ImageMipmaps*(image: Image) {.RLAPI, importc: "ImageMipmaps".} # Generate all mipmap levels for a provided image
-proc ImageDither*(image: Image; rBpp: int32; gBpp: int32; bBpp: int32; aBpp: int32) {.RLAPI, importc: "ImageDither".} # Dither image data to 16bpp or lower (Floyd-Steinberg dithering)
-proc ImageExtractPalette*(image: Image; maxPaletteSize: int32; extractCount: int32): Color {.RLAPI, importc: "ImageExtractPalette".} # Extract color palette from image to maximum size (memory should be freed)
+proc ImageToPOT*(image: ptr Image; fillColor: Color) {.RLAPI, importc: "ImageToPOT".} # Convert image to POT (power-of-two)
+proc ImageFormat*(image: ptr Image; newFormat: int32) {.RLAPI, importc: "ImageFormat".} # Convert image data to desired format
+proc ImageAlphaMask*(image: ptr Image; alphaMask: Image) {.RLAPI, importc: "ImageAlphaMask".} # Apply alpha mask to image
+proc ImageAlphaClear*(image: ptr Image; color: Color; threshold: float32) {.RLAPI, importc: "ImageAlphaClear".} # Clear alpha channel to desired color
+proc ImageAlphaCrop*(image: ptr Image; threshold: float32) {.RLAPI, importc: "ImageAlphaCrop".} # Crop image depending on alpha value
+proc ImageAlphaPremultiply*(image: ptr Image) {.RLAPI, importc: "ImageAlphaPremultiply".} # Premultiply alpha channel
+proc ImageCrop*(image: ptr Image; crop: Rectangle) {.RLAPI, importc: "ImageCrop".} # Crop an image to a defined rectangle
+proc ImageResize*(image: ptr Image; newWidth: int32; newHeight: int32) {.RLAPI, importc: "ImageResize".} # Resize image (Bicubic scaling algorithm)
+proc ImageResizeNN*(image: ptr Image; newWidth: int32; newHeight: int32) {.RLAPI, importc: "ImageResizeNN".} # Resize image (Nearest-Neighbor scaling algorithm)
+proc ImageResizeCanvas*(image: ptr Image; newWidth: int32; newHeight: int32; offsetX: int32; offsetY: int32; color: Color) {.RLAPI, importc: "ImageResizeCanvas".} # Resize canvas and fill with color
+proc ImageMipmaps*(image: ptr Image) {.RLAPI, importc: "ImageMipmaps".} # Generate all mipmap levels for a provided image
+proc ImageDither*(image: ptr Image; rBpp: int32; gBpp: int32; bBpp: int32; aBpp: int32) {.RLAPI, importc: "ImageDither".} # Dither image data to 16bpp or lower (Floyd-Steinberg dithering)
+proc ImageExtractPalette*(image: Image; maxPaletteSize: int32; extractCount: int32): ptr Color {.RLAPI, importc: "ImageExtractPalette".} # Extract color palette from image to maximum size (memory should be freed)
 proc ImageText*(text: cstring; fontSize: int32; color: Color): Image {.RLAPI, importc: "ImageText".} # Create an image from text (default font)
 proc ImageTextEx*(font: Font; text: cstring; fontSize: float32; spacing: float32; tint: Color): Image {.RLAPI, importc: "ImageTextEx".} # Create an image from text (custom sprite font)
-proc ImageDraw*(dst: Image; src: Image; srcRec: Rectangle; dstRec: Rectangle; tint: Color) {.RLAPI, importc: "ImageDraw".} # Draw a source image within a destination image (tint applied to source)
-proc ImageDrawRectangle*(dst: Image; rec: Rectangle; color: Color) {.RLAPI, importc: "ImageDrawRectangle".} # Draw rectangle within an image
-proc ImageDrawRectangleLines*(dst: Image; rec: Rectangle; thick: int32; color: Color) {.RLAPI, importc: "ImageDrawRectangleLines".} # Draw rectangle lines within an image
-proc ImageDrawText*(dst: Image; position: Vector2; text: cstring; fontSize: int32; color: Color) {.RLAPI, importc: "ImageDrawText".} # Draw text (default font) within an image (destination)
-proc ImageDrawTextEx*(dst: Image; position: Vector2; font: Font; text: cstring; fontSize: float32; spacing: float32; color: Color) {.RLAPI, importc: "ImageDrawTextEx".} # Draw text (custom sprite font) within an image (destination)
-proc ImageFlipVertical*(image: Image) {.RLAPI, importc: "ImageFlipVertical".} # Flip image vertically
-proc ImageFlipHorizontal*(image: Image) {.RLAPI, importc: "ImageFlipHorizontal".} # Flip image horizontally
-proc ImageRotateCW*(image: Image) {.RLAPI, importc: "ImageRotateCW".} # Rotate image clockwise 90deg
-proc ImageRotateCCW*(image: Image) {.RLAPI, importc: "ImageRotateCCW".} # Rotate image counter-clockwise 90deg
-proc ImageColorTint*(image: Image; color: Color) {.RLAPI, importc: "ImageColorTint".} # Modify image color: tint
-proc ImageColorInvert*(image: Image) {.RLAPI, importc: "ImageColorInvert".} # Modify image color: invert
-proc ImageColorGrayscale*(image: Image) {.RLAPI, importc: "ImageColorGrayscale".} # Modify image color: grayscale
-proc ImageColorContrast*(image: Image; contrast: float32) {.RLAPI, importc: "ImageColorContrast".} # Modify image color: contrast (-100 to 100)
-proc ImageColorBrightness*(image: Image; brightness: int32) {.RLAPI, importc: "ImageColorBrightness".} # Modify image color: brightness (-255 to 255)
-proc ImageColorReplace*(image: Image; color: Color; replace: Color) {.RLAPI, importc: "ImageColorReplace".} # Modify image color: replace color
+proc ImageDraw*(dst: ptr Image; src: Image; srcRec: Rectangle; dstRec: Rectangle; tint: Color) {.RLAPI, importc: "ImageDraw".} # Draw a source image within a destination image (tint applied to source)
+proc ImageDrawRectangle*(dst: ptr Image; rec: Rectangle; color: Color) {.RLAPI, importc: "ImageDrawRectangle".} # Draw rectangle within an image
+proc ImageDrawRectangleLines*(dst: ptr Image; rec: Rectangle; thick: int32; color: Color) {.RLAPI, importc: "ImageDrawRectangleLines".} # Draw rectangle lines within an image
+proc ImageDrawText*(dst: ptr Image; position: Vector2; text: cstring; fontSize: int32; color: Color) {.RLAPI, importc: "ImageDrawText".} # Draw text (default font) within an image (destination)
+proc ImageDrawTextEx*(dst: ptr Image; position: Vector2; font: Font; text: cstring; fontSize: float32; spacing: float32; color: Color) {.RLAPI, importc: "ImageDrawTextEx".} # Draw text (custom sprite font) within an image (destination)
+proc ImageFlipVertical*(image: ptr Image) {.RLAPI, importc: "ImageFlipVertical".} # Flip image vertically
+proc ImageFlipHorizontal*(image: ptr Image) {.RLAPI, importc: "ImageFlipHorizontal".} # Flip image horizontally
+proc ImageRotateCW*(image: ptr Image) {.RLAPI, importc: "ImageRotateCW".} # Rotate image clockwise 90deg
+proc ImageRotateCCW*(image: ptr Image) {.RLAPI, importc: "ImageRotateCCW".} # Rotate image counter-clockwise 90deg
+proc ImageColorTint*(image: ptr Image; color: Color) {.RLAPI, importc: "ImageColorTint".} # Modify image color: tint
+proc ImageColorInvert*(image: ptr Image) {.RLAPI, importc: "ImageColorInvert".} # Modify image color: invert
+proc ImageColorGrayscale*(image: ptr Image) {.RLAPI, importc: "ImageColorGrayscale".} # Modify image color: grayscale
+proc ImageColorContrast*(image: ptr Image; contrast: float32) {.RLAPI, importc: "ImageColorContrast".} # Modify image color: contrast (-100 to 100)
+proc ImageColorBrightness*(image: ptr Image; brightness: int32) {.RLAPI, importc: "ImageColorBrightness".} # Modify image color: brightness (-255 to 255)
+proc ImageColorReplace*(image: ptr Image; color: Color; replace: Color) {.RLAPI, importc: "ImageColorReplace".} # Modify image color: replace color
 # Image generation functions
 proc GenImageColor*(width: int32; height: int32; color: Color): Image {.RLAPI, importc: "GenImageColor".} # Generate image: plain color
 proc GenImageGradientV*(width: int32; height: int32; top: Color; bottom: Color): Image {.RLAPI, importc: "GenImageGradientV".} # Generate image: vertical gradient
@@ -949,7 +951,7 @@ proc GenImageWhiteNoise*(width: int32; height: int32; factor: float32): Image {.
 proc GenImagePerlinNoise*(width: int32; height: int32; offsetX: int32; offsetY: int32; scale: float32): Image {.RLAPI, importc: "GenImagePerlinNoise".} # Generate image: perlin noise
 proc GenImageCellular*(width: int32; height: int32; tileSize: int32): Image {.RLAPI, importc: "GenImageCellular".} # Generate image: cellular algorithm. Bigger tileSize means bigger cells
 # Texture2D configuration functions
-proc GenTextureMipmaps*(texture: Texture2D) {.RLAPI, importc: "GenTextureMipmaps".} # Generate GPU mipmaps for a texture
+proc GenTextureMipmaps*(texture: ptr Texture2D) {.RLAPI, importc: "GenTextureMipmaps".} # Generate GPU mipmaps for a texture
 proc SetTextureFilter*(texture: Texture2D; filterMode: int32) {.RLAPI, importc: "SetTextureFilter".} # Set texture scaling filter mode
 proc SetTextureWrap*(texture: Texture2D; wrapMode: int32) {.RLAPI, importc: "SetTextureWrap".} # Set texture wrapping mode
 # Texture2D drawing functions
@@ -968,8 +970,8 @@ proc GetFontDefault*(): Font {.RLAPI, importc: "GetFontDefault".} # Get the defa
 proc LoadFont*(fileName: cstring): Font {.RLAPI, importc: "LoadFont".} # Load font from file into GPU memory (VRAM)
 proc LoadFontEx*(fileName: cstring; fontSize: int32; fontChars: int32; charsCount: int32): Font {.RLAPI, importc: "LoadFontEx".} # Load font from file with extended parameters
 proc LoadFontFromImage*(image: Image; key: Color; firstChar: int32): Font {.RLAPI, importc: "LoadFontFromImage".} # Load font from Image (XNA style)
-proc LoadFontData*(fileName: cstring; fontSize: int32; fontChars: int32; charsCount: int32; typex: int32): CharInfo {.RLAPI, importc: "LoadFontData".} # Load font data for further use
-proc GenImageFontAtlas*(chars: ptr CharInfo; recs: Rectangle; charsCount: int32; fontSize: int32; padding: int32; packMethod: int32): Image {.RLAPI, importc: "GenImageFontAtlas".} # Generate image font atlas using chars info
+proc LoadFontData*(fileName: cstring; fontSize: int32; fontChars: int32; charsCount: int32; typex: int32): ptr CharInfo {.RLAPI, importc: "LoadFontData".} # Load font data for further use
+proc GenImageFontAtlas*(chars: ptr ptr CharInfo; recs: ptr Rectangle; charsCount: int32; fontSize: int32; padding: int32; packMethod: int32): Image {.RLAPI, importc: "GenImageFontAtlas".} # Generate image font atlas using chars info
 proc UnloadFont*(font: Font) {.RLAPI, importc: "UnloadFont".} # Unload Font from GPU memory (VRAM)
 # Text drawing functions
 proc DrawFPS*(posX: int32; posY: int32) {.RLAPI, importc: "DrawFPS".} # Shows current FPS
@@ -984,22 +986,22 @@ proc MeasureTextEx*(font: Font; text: cstring; fontSize: float32; spacing: float
 proc GetGlyphIndex*(font: Font; codepoint: int32): int32 {.RLAPI, importc: "GetGlyphIndex".} # Get index position for a unicode character on font
 # Text strings management functions (no utf8 strings, only byte chars)
 # NOTE: Some strings allocate memory internally for returned strings, just be careful!
-proc TextCopy*(dst: char; src: cstring): int32 {.RLAPI, importc: "TextCopy".} # Copy one string to another, returns bytes copied
+proc TextCopy*(dst: ptr char; src: cstring): int32 {.RLAPI, importc: "TextCopy".} # Copy one string to another, returns bytes copied
 proc TextIsEqual*(text1: cstring; text2: cstring): bool {.RLAPI, importc: "TextIsEqual".} # Check if two text string are equal
 proc TextLength*(text: cstring): uint32 {.RLAPI, importc: "TextLength".} # Get text length, checks for '\0' ending
 proc TextFormat*(text: cstring): cstring {.RLAPI, varargs, importc: "TextFormat".} # Text formatting with variables (sprintf style)
 proc TextSubtext*(text: cstring; position: int32; length: int32): cstring {.RLAPI, importc: "TextSubtext".} # Get a piece of a text string
-proc TextReplace*(text: char; replace: cstring; by: cstring): char {.RLAPI, importc: "TextReplace".} # Replace text string (memory must be freed!)
-proc TextInsert*(text: cstring; insert: cstring; position: int32): char {.RLAPI, importc: "TextInsert".} # Insert text in a position (memory must be freed!)
+proc TextReplace*(text: ptr char; replace: cstring; by: cstring): ptr char {.RLAPI, importc: "TextReplace".} # Replace text string (memory must be freed!)
+proc TextInsert*(text: cstring; insert: cstring; position: int32): ptr char {.RLAPI, importc: "TextInsert".} # Insert text in a position (memory must be freed!)
 proc TextJoin*(textList: cstring; count: int32; delimiter: cstring): cstring {.RLAPI, importc: "TextJoin".} # Join text strings with delimiter
 proc TextSplit*(text: cstring; delimiter: char; count: int32): cstring {.RLAPI, importc: "TextSplit".} # Split text into multiple strings
-proc TextAppend*(text: char; append: cstring; position: int32) {.RLAPI, importc: "TextAppend".} # Append text at specific position and move cursor!
+proc TextAppend*(text: ptr char; append: cstring; position: int32) {.RLAPI, importc: "TextAppend".} # Append text at specific position and move cursor!
 proc TextFindIndex*(text: cstring; find: cstring): int32 {.RLAPI, importc: "TextFindIndex".} # Find first text occurrence within a string
 proc TextToUpper*(text: cstring): cstring {.RLAPI, importc: "TextToUpper".} # Get upper case version of provided string
 proc TextToLower*(text: cstring): cstring {.RLAPI, importc: "TextToLower".} # Get lower case version of provided string
 proc TextToPascal*(text: cstring): cstring {.RLAPI, importc: "TextToPascal".} # Get Pascal case notation version of provided string
 proc TextToInteger*(text: cstring): int32 {.RLAPI, importc: "TextToInteger".} # Get integer value from text (negative values not supported)
-proc TextToUtf8*(codepoints: int32; length: int32): char {.RLAPI, importc: "TextToUtf8".} # Encode text codepoint into utf8 text (memory must be freed!)
+proc TextToUtf8*(codepoints: int32; length: int32): ptr char {.RLAPI, importc: "TextToUtf8".} # Encode text codepoint into utf8 text (memory must be freed!)
 # UTF8 text strings management functions
 proc GetCodepoints*(text: cstring; count: int32): int32 {.RLAPI, importc: "GetCodepoints".} # Get all codepoints in a string, codepoints count returned by parameters
 proc GetCodepointsCount*(text: cstring): int32 {.RLAPI, importc: "GetCodepointsCount".} # Get total number of characters (codepoints) in a UTF8 encoded string
@@ -1035,17 +1037,17 @@ proc LoadModel*(fileName: cstring): Model {.RLAPI, importc: "LoadModel".} # Load
 proc LoadModelFromMesh*(mesh: Mesh): Model {.RLAPI, importc: "LoadModelFromMesh".} # Load model from generated mesh (default material)
 proc UnloadModel*(model: Model) {.RLAPI, importc: "UnloadModel".} # Unload model from memory (RAM and/or VRAM)
 # Mesh loading/unloading functions
-proc LoadMeshes*(fileName: cstring; meshCount: int32): Mesh {.RLAPI, importc: "LoadMeshes".} # Load meshes from model file
+proc LoadMeshes*(fileName: cstring; meshCount: int32): ptr Mesh {.RLAPI, importc: "LoadMeshes".} # Load meshes from model file
 proc ExportMesh*(mesh: Mesh; fileName: cstring) {.RLAPI, importc: "ExportMesh".} # Export mesh data to file
 proc UnloadMesh*(mesh: Mesh) {.RLAPI, importc: "UnloadMesh".} # Unload mesh from memory (RAM and/or VRAM)
 # Material loading/unloading functions
-proc LoadMaterials*(fileName: cstring; materialCount: int32): Material {.RLAPI, importc: "LoadMaterials".} # Load materials from model file
+proc LoadMaterials*(fileName: cstring; materialCount: int32): ptr Material {.RLAPI, importc: "LoadMaterials".} # Load materials from model file
 proc LoadMaterialDefault*(): Material {.RLAPI, importc: "LoadMaterialDefault".} # Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)
 proc UnloadMaterial*(material: Material) {.RLAPI, importc: "UnloadMaterial".} # Unload material from GPU memory (VRAM)
-proc SetMaterialTexture*(material: Material; mapType: int32; texture: Texture2D) {.RLAPI, importc: "SetMaterialTexture".} # Set texture for a material map type (MAP_DIFFUSE, MAP_SPECULAR...)
-proc SetModelMeshMaterial*(model: Model; meshId: int32; materialId: int32) {.RLAPI, importc: "SetModelMeshMaterial".} # Set material for a mesh
+proc SetMaterialTexture*(material: ptr Material; mapType: int32; texture: Texture2D) {.RLAPI, importc: "SetMaterialTexture".} # Set texture for a material map type (MAP_DIFFUSE, MAP_SPECULAR...)
+proc SetModelMeshMaterial*(model: ptr Model; meshId: int32; materialId: int32) {.RLAPI, importc: "SetModelMeshMaterial".} # Set material for a mesh
 # Model animations loading/unloading functions
-proc LoadModelAnimations*(fileName: cstring; animsCount: int32): ModelAnimation {.RLAPI, importc: "LoadModelAnimations".} # Load model animations from file
+proc LoadModelAnimations*(fileName: cstring; animsCount: int32): ptr ModelAnimation {.RLAPI, importc: "LoadModelAnimations".} # Load model animations from file
 proc UpdateModelAnimation*(model: Model; anim: ModelAnimation; frame: int32) {.RLAPI, importc: "UpdateModelAnimation".} # Update model animation pose
 proc UnloadModelAnimation*(anim: ModelAnimation) {.RLAPI, importc: "UnloadModelAnimation".} # Unload animation data
 proc IsModelAnimationValid*(model: Model; anim: ModelAnimation): bool {.RLAPI, importc: "IsModelAnimationValid".} # Check model animation skeleton match
@@ -1062,8 +1064,8 @@ proc GenMeshHeightmap*(heightmap: Image; size: Vector3): Mesh {.RLAPI, importc: 
 proc GenMeshCubicmap*(cubicmap: Image; cubeSize: Vector3): Mesh {.RLAPI, importc: "GenMeshCubicmap".} # Generate cubes-based map mesh from image data
 # Mesh manipulation functions
 proc MeshBoundingBox*(mesh: Mesh): BoundingBox {.RLAPI, importc: "MeshBoundingBox".} # Compute mesh bounding box limits
-proc MeshTangents*(mesh: Mesh) {.RLAPI, importc: "MeshTangents".} # Compute mesh tangents
-proc MeshBinormals*(mesh: Mesh) {.RLAPI, importc: "MeshBinormals".} # Compute mesh binormals
+proc MeshTangents*(mesh: ptr Mesh) {.RLAPI, importc: "MeshTangents".} # Compute mesh tangents
+proc MeshBinormals*(mesh: ptr Mesh) {.RLAPI, importc: "MeshBinormals".} # Compute mesh binormals
 # Model drawing functions
 proc DrawModel*(model: Model; position: Vector3; scale: float32; tint: Color) {.RLAPI, importc: "DrawModel".} # Draw a model (with texture if set)
 proc DrawModelEx*(model: Model; position: Vector3; rotationAxis: Vector3; rotationAngle: float32; scale: Vector3; tint: Color) {.RLAPI, importc: "DrawModelEx".} # Draw a model with extended parameters
@@ -1077,7 +1079,7 @@ proc CheckCollisionSpheres*(centerA: Vector3; radiusA: float32; centerB: Vector3
 proc CheckCollisionBoxes*(box1: BoundingBox; box2: BoundingBox): bool {.RLAPI, importc: "CheckCollisionBoxes".} # Detect collision between two bounding boxes
 proc CheckCollisionBoxSphere*(box: BoundingBox; center: Vector3; radius: float32): bool {.RLAPI, importc: "CheckCollisionBoxSphere".} # Detect collision between box and sphere
 proc CheckCollisionRaySphere*(ray: Ray; center: Vector3; radius: float32): bool {.RLAPI, importc: "CheckCollisionRaySphere".} # Detect collision between ray and sphere
-proc CheckCollisionRaySphereEx*(ray: Ray; center: Vector3; radius: float32; collisionPoint: Vector3): bool {.RLAPI, importc: "CheckCollisionRaySphereEx".} # Detect collision between ray and sphere, returns collision point
+proc CheckCollisionRaySphereEx*(ray: Ray; center: Vector3; radius: float32; collisionPoint: ptr Vector3): bool {.RLAPI, importc: "CheckCollisionRaySphereEx".} # Detect collision between ray and sphere, returns collision point
 proc CheckCollisionRayBox*(ray: Ray; box: BoundingBox): bool {.RLAPI, importc: "CheckCollisionRayBox".} # Detect collision between ray and box
 proc GetCollisionRayModel*(ray: Ray; model: Model): RayHitInfo {.RLAPI, importc: "GetCollisionRayModel".} # Get collision info between ray and model
 proc GetCollisionRayTriangle*(ray: Ray; p1: Vector3; p2: Vector3; p3: Vector3): RayHitInfo {.RLAPI, importc: "GetCollisionRayTriangle".} # Get collision info between ray and triangle
@@ -1087,7 +1089,7 @@ proc GetCollisionRayGround*(ray: Ray; groundHeight: float32): RayHitInfo {.RLAPI
 # NOTE: This functions are useless when using OpenGL 1.1
 # ------------------------------------------------------------------------------------
 # Shader loading/unloading functions
-proc LoadText*(fileName: cstring): char {.RLAPI, importc: "LoadText".} # Load chars array from text file
+proc LoadText*(fileName: cstring): ptr char {.RLAPI, importc: "LoadText".} # Load chars array from text file
 proc LoadShader*(vsFileName: cstring; fsFileName: cstring): Shader {.RLAPI, importc: "LoadShader".} # Load shader from files and bind default locations
 proc LoadShaderCode*(vsCode: cstring; fsCode: cstring): Shader {.RLAPI, importc: "LoadShaderCode".} # Load shader from code strings and bind default locations
 proc UnloadShader*(shader: Shader) {.RLAPI, importc: "UnloadShader".} # Unload shader from GPU memory (VRAM)
@@ -1120,7 +1122,7 @@ proc EndBlendMode*() {.RLAPI, importc: "EndBlendMode".} # End blending mode (res
 # VR control functions
 proc InitVrSimulator*() {.RLAPI, importc: "InitVrSimulator".} # Init VR simulator for selected device parameters
 proc CloseVrSimulator*() {.RLAPI, importc: "CloseVrSimulator".} # Close VR simulator for current device
-proc UpdateVrTracking*(camera: Camera) {.RLAPI, importc: "UpdateVrTracking".} # Update VR tracking (position and orientation) and camera
+proc UpdateVrTracking*(camera: ptr Camera) {.RLAPI, importc: "UpdateVrTracking".} # Update VR tracking (position and orientation) and camera
 proc SetVrConfiguration*(info: VrDeviceInfo; distortion: Shader) {.RLAPI, importc: "SetVrConfiguration".} # Set stereo rendering configuration parameters
 proc IsVrSimulatorReady*(): bool {.RLAPI, importc: "IsVrSimulatorReady".} # Detect if VR simulator is ready
 proc ToggleVrMode*() {.RLAPI, importc: "ToggleVrMode".} # Enable/Disable VR experience
@@ -1154,9 +1156,9 @@ proc GetSoundsPlaying*(): int32 {.RLAPI, importc: "GetSoundsPlaying".} # Get num
 proc IsSoundPlaying*(sound: Sound): bool {.RLAPI, importc: "IsSoundPlaying".} # Check if a sound is currently playing
 proc SetSoundVolume*(sound: Sound; volume: float32) {.RLAPI, importc: "SetSoundVolume".} # Set volume for a sound (1.0 is max level)
 proc SetSoundPitch*(sound: Sound; pitch: float32) {.RLAPI, importc: "SetSoundPitch".} # Set pitch for a sound (1.0 is base level)
-proc WaveFormat*(wave: Wave; sampleRate: int32; sampleSize: int32; channels: int32) {.RLAPI, importc: "WaveFormat".} # Convert wave data to desired format
+proc WaveFormat*(wave: ptr Wave; sampleRate: int32; sampleSize: int32; channels: int32) {.RLAPI, importc: "WaveFormat".} # Convert wave data to desired format
 proc WaveCopy*(wave: Wave): Wave {.RLAPI, importc: "WaveCopy".} # Copy a wave to a new wave
-proc WaveCrop*(wave: Wave; initSample: int32; finalSample: int32) {.RLAPI, importc: "WaveCrop".} # Crop a wave to defined samples range
+proc WaveCrop*(wave: ptr Wave; initSample: int32; finalSample: int32) {.RLAPI, importc: "WaveCrop".} # Crop a wave to defined samples range
 proc GetWaveData*(wave: Wave): float32 {.RLAPI, importc: "GetWaveData".} # Get samples data from wave as a floats array
 # Music management functions
 proc LoadMusicStream*(fileName: cstring): Music {.RLAPI, importc: "LoadMusicStream".} # Load music stream from file
