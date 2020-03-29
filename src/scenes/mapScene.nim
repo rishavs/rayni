@@ -1,46 +1,13 @@
 import ../../lib/raylib
 
 import ../defs
+import ../logic/mapgen
 
-const cellSize          = 50
-const roomSquareSize    = 3 # how many cells make up a room. Has to be odd
-const roomDoorSize      = 3 # how many cells lie between 2 rooms
-const roomCountX = 4
-const roomCountY = 4
-
-type
-    Node* = object
-        posX, posY : int
-        isRoom : bool
-    
-    ListOfNodes = array[4, Node]
-        
-let test_node_list = [
-    Node( posX: 0, posY: 0, isRoom : true),
-    Node( posX: 1, posY: 0, isRoom : true),
-    Node( posX: 2, posY: 0, isRoom : true),
-    Node( posX: 3, posY: 0, isRoom : true),
-
-    Node( posX: 0, posY: 1, isRoom : true),
-    Node( posX: 1, posY: 1, isRoom : true),
-    Node( posX: 2, posY: 1, isRoom : true),
-    Node( posX: 3, posY: 1, isRoom : true),
-
-    Node( posX: 0, posY: 2, isRoom : true),
-    Node( posX: 1, posY: 2, isRoom : true),
-    Node( posX: 2, posY: 2, isRoom : true),
-    Node( posX: 3, posY: 2, isRoom : true),
-
-    Node( posX: 0, posY: 3, isRoom : true),
-    Node( posX: 1, posY: 3, isRoom : true),
-    Node( posX: 2, posY: 3, isRoom : true),
-    Node( posX: 3, posY: 3, isRoom : true),
-
-]
-        
+var test_node_list: ListOfNodes
 
 proc mapScene_init*(): void =
     echo "Initializing Map"
+    test_node_list = map_generate()
 
 proc mapScene_update*(): void =
     if IsKeyDown KEY_BACKSPACE :
@@ -63,7 +30,7 @@ proc mapScene_draw*(): void =
         DrawLine i, 0, i, screenHeight, Fade(LIGHTGRAY, 0.6f)
         
         # horizontal grid lines
-        for j in countup(roomDoorSize * cellSize, (roomCountY * roomSquareSize * cellSize)+ roomCountY * roomDoorSize * cellSize, cellSize):
+        for j in countup(roomDoorSize * cellSize, (roomCountY * roomSquareSize * cellSize) + roomCountY * roomDoorSize * cellSize, cellSize):
             DrawLine 0, j, screenWidth, j, Fade(LIGHTGRAY, 0.6f)
     
     for node in test_node_list:
