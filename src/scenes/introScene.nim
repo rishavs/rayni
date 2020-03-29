@@ -10,8 +10,9 @@ proc introScene_init*(): void =
 
 proc introScene_update*(): void =
     if (introTimer - toInt(GetTime())) <= 0:
-        currentScene = mainScn
-        sceneInit = true
+        prevScene       = introScn
+        nextScene    = mainScn
+        sceneChange       = true
         return
 
 proc introScene_draw*(): void =

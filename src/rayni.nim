@@ -14,8 +14,8 @@ import defs
 # Initialize game logic
 #--------------------------------------------------------------------------------------
 
-currentScene    = introScn
-sceneInit       = true        
+nextScene       = mapScn
+sceneChange     = true        
 
 import scenes/[
     introScene,
@@ -33,37 +33,59 @@ while not WindowShouldClose():
     #----------------------------------------------------------------------------------
     #  Init, Update & draw Scene
     # ---------------------------------------------------------------------------------
-    case currentScene
+    case prevScene:
     of introScn:
-        if sceneInit: 
+        if sceneChange: 
+            introScene_cleanup()
+    of mainScn:
+        if sceneChange: 
+            mainScene_cleanup()
+    of settingsScn:
+        if sceneChange: 
+            settingsScene_cleanup()
+    of mapScn:
+        if sceneChange: 
+            mapScene_cleanup()
+    of gameScn:
+        if sceneChange: 
+            gameScene_cleanup()
+    else:
+        discard
+        
+    case nextScene
+    of introScn:
+        if sceneChange: 
             introScene_init()
-            sceneInit = false
+            sceneChange = false
         introScene_update()
         introScene_draw()
     of mainScn:
-        if sceneInit: 
+        if sceneChange: 
             mainScene_init()
-            sceneInit = false
+            sceneChange = false
         mainScene_update()
         mainScene_draw()
     of settingsScn:
-        if sceneInit: 
+        if sceneChange: 
             settingsScene_init()
-            sceneInit = false
+            sceneChange = false
         settingsScene_update()
         settingsScene_draw()
     of mapScn:
-        if sceneInit: 
+        if sceneChange: 
             mapScene_init()
-            sceneInit = false
+            sceneChange = false
         mapScene_update()
         mapScene_draw()
     of gameScn:
-        if sceneInit: 
+        if sceneChange: 
             gameScene_init()
-            sceneInit = false
+            sceneChange = false
         gameScene_update()
         gameScene_draw()
+    else:
+        discard
+
 
     #-----------------------------------------------------------------------------------
     #  Override Update

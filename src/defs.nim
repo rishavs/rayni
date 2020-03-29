@@ -11,22 +11,19 @@ const screenHeight* = 1440
 #--------------------------------------------------------------------------------------
 
 type
-    Scenes* = enum introScn, mainScn, settingsScn, mapScn, gameScn
+    Scenes* = enum noScn, introScn, mainScn, settingsScn, mapScn, gameScn
 
 var 
-    currentScene*: Scenes
-    sceneInit* : bool
+    nextScene*: Scenes
+    prevScene*: Scenes
+    sceneChange* : bool
     menuMusic* : Music
+    menuBtnClickSound* : Sound
 
 #--------------------------------------------------------------------------------------
 # Load assets
 #--------------------------------------------------------------------------------------
-const menuMusicFile = "assets/guitar_noodling.ogg"
-
-if FileExists menuMusicFile:
-    echo "File Found"
-else :
-    echo "No File found"
 
 InitAudioDevice()        
-menuMusic = LoadMusicStream menuMusicFile
+menuMusic = LoadMusicStream "assets/guitar_noodling.ogg"
+menuBtnClickSound = LoadSound "assets/misc_menu_4.wav"

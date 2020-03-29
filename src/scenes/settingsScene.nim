@@ -17,11 +17,13 @@ proc settingsScene_draw*(): void =
 
     if GuiButton(Rectangle(x: 600, y: 300, width: 200, height: 50), "Toggle Full Screen"):
         echo "clicked Full Screen"
-        ToggleFullscreen()
+        # ToggleFullscreen()
 
     if GuiButton(Rectangle(x: 600, y: 400, width: 200, height: 50), "Back"):
         echo "clicked Back"
-        currentScene = mainScn
+        prevScene       = settingsScn
+        nextScene       = mainScn
+        sceneChange     = true
 
     EndDrawing()
 
