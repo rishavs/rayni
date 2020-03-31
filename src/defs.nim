@@ -30,10 +30,13 @@ var
 type
     Directions* = enum North, East, South, West
 
+    Cell* = object
+        x: int
+
     Node* = object
         posX*, posY*    : int
         isRoom*         : bool
-        openDoors*      : array[4, Directions]
+        openDoors*      : seq[Directions]
         isNorthOpen*    : bool
         isEastOpen*     : bool
         isSouthOpen*    : bool
