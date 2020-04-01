@@ -37,10 +37,6 @@ type
         posX*, posY*    : int
         isRoom*         : bool
         openDoors*      : seq[Directions]
-        isNorthOpen*    : bool
-        isEastOpen*     : bool
-        isSouthOpen*    : bool
-        isWestOpen*     : bool
     
     ListOfNodes* = array[roomCountX * roomCountY, Node]
 #--------------------------------------------------------------------------------------

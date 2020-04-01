@@ -35,47 +35,48 @@ proc mapScene_draw*(): void =
             DrawLine 0, j, screenWidth, j, Fade(LIGHTGRAY, 0.6f)
     
     for node in test_node_list:
-        var offsetX = roomDoorSize * cellSize * (node.posX + 1)
-        var offsetY = roomDoorSize * cellSize * (node.posY + 1)
+        var offsetX = roomDoorSize * (node.posX ) + roomDoorSize
+        var offsetY = roomDoorSize * (node.posY ) + roomDoorSize
 
         if node.isRoom == true:
             # Draw node as room
-            DrawRectangle(
-                offsetX + (node.posX * 3 * cellSize),
-                offsetY + (node.posY * 3 * cellSize) ,
-                cellSize * 3,
-                cellSize * 3,
+            DrawRectangleLines(
+                cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - roomSquareSize),
+                cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - roomSquareSize),
+                cellSize * (roomSquareSize),
+                cellSize * (roomSquareSize),
                 RED
             )
         else:
             DrawRectangle(
-                offsetX + (node.posX * 3 * cellSize) + cellsize,
-                offsetY + (node.posY * 3 * cellSize) + cellSize,
+                cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - (roomSquareSize - 1)),
+                cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - (roomSquareSize - 1)),
                 cellSize,
                 cellSize,
-                RED
+                BLUE
             )
-        # Draw open doors & Corridors. FOr this we will simply join the central cells
+        # Draw open doors & Corridors. For this we will simply join the central cells
+        # We only need to handle 2 directions as the door will also be open from the other side anyway
         for door in node.openDoors:
             case door:
-            of North:
+            of South:
                 DrawRectangle(
-                    offsetX + (node.posX * 3 * cellSize) + cellSize,
-                    offsetY + (node.posY * 3 * cellSize) - 2 * cellSize,
+                    cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - (roomSquareSize - (roomSquareSize div 2))),
+                    cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - (roomSquareSize div 2)),
                     cellSize,
-                    cellSize * 3,
+                    cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2))),
                     RED
                 )
             of East:
+                discard
                 DrawRectangle(
-                    offsetX + (node.posX * 3 * cellSize) + (2 * cellSize),
-                    offsetY + (node.posY * 3 * cellSize) + cellSize,
-                    cellSize * 3,
+                    cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - (roomSquareSize div 2)),
+                    cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - (roomSquareSize - (roomSquareSize div 2))),
+                    cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2))),
                     cellSize,
                     RED
                 )
-            # We only need to handle 2 directions as the door will also be open from the other side anyway
-            of South:
+            of North:
                 discard
             of West:
                 discard
