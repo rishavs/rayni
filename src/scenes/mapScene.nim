@@ -40,7 +40,7 @@ proc mapScene_draw*(): void =
 
         if node.isRoom == true:
             # Draw node as room
-            DrawRectangleLines(
+            DrawRectangle(
                 cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - roomSquareSize),
                 cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - roomSquareSize),
                 cellSize * (roomSquareSize),
@@ -49,8 +49,8 @@ proc mapScene_draw*(): void =
             )
         else:
             DrawRectangle(
-                cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - (roomSquareSize - 1)),
-                cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - (roomSquareSize - 1)),
+                cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - (roomSquareSize - (roomSquareSize div 2))),
+                cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - (roomSquareSize - (roomSquareSize div 2))),
                 cellSize,
                 cellSize,
                 BLUE
@@ -64,7 +64,7 @@ proc mapScene_draw*(): void =
                     cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - (roomSquareSize - (roomSquareSize div 2))),
                     cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - (roomSquareSize div 2)),
                     cellSize,
-                    cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2))),
+                    cellSize * (roomDoorSize + (roomSquareSize )),
                     RED
                 )
             of East:
@@ -72,7 +72,7 @@ proc mapScene_draw*(): void =
                 DrawRectangle(
                     cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - (roomSquareSize div 2)),
                     cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - (roomSquareSize - (roomSquareSize div 2))),
-                    cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2))),
+                    cellSize * (roomDoorSize + (roomSquareSize)),
                     cellSize,
                     RED
                 )
