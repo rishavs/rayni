@@ -5,14 +5,14 @@ import ../logic/mapgen
 
 var test_node_list: ListOfNodes
 
-const
-    roomCellColor       = RED
-    doorCellColor       = GREEN
-    corridorCellColor   = YELLOW
+# const
+#     roomCellColor       = RED
+#     doorCellColor       = GREEN
+#     corridorCellColor   = YELLOW
 
 proc mapScene_init*(): void =
     echo "Initializing Map"
-    test_node_list = map_generate()
+    test_node_list = map_generate(roomCountX, roomCountY, roomDoorSize)
     # next step will generate cell level data from room level data using cellSize, room num and few other vars
 
 proc mapScene_update*(): void =
@@ -35,9 +35,6 @@ proc mapScene_draw*(): void =
             DrawLine 0, j, screenWidth, j, Fade(LIGHTGRAY, 0.6f)
     
     for node in test_node_list:
-        var offsetX = roomDoorSize * (node.posX ) + roomDoorSize
-        var offsetY = roomDoorSize * (node.posY ) + roomDoorSize
-
         if node.isRoom == true:
             # Draw node as room
             DrawRectangle(

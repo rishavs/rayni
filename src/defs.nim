@@ -36,9 +36,11 @@ type
     Node* = object
         posX*, posY*    : int
         isRoom*         : bool
-        openDoors*      : seq[Directions]
+        isVisited*      : bool
+        openDoors*      : set[Directions]
+        availableDoors* : set[Directions]
     
-    ListOfNodes* = array[roomCountX * roomCountY, Node]
+    ListOfNodes* = seq[Node]
 #--------------------------------------------------------------------------------------
 # Load assets
 #--------------------------------------------------------------------------------------
