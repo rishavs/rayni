@@ -22,7 +22,7 @@ proc map_generate*(rCountX: int, rCountY: int, rDoorSize: int): ListOfNodes =
     var curNodeX    : int   = startingNodeX
     var curNodeY    : int   = startingNodeY
 
-    while not isLoopDone:
+    while true:
         var prevNodeX   : int   = startingNodeX
         var prevNodeY   : int   = startingNodeY
 
@@ -48,33 +48,49 @@ proc map_generate*(rCountX: int, rCountY: int, rDoorSize: int): ListOfNodes =
         # list all open doors
         echo "Available doors are: " & $curNode.availableDoors
 
-        nextDoor = sample curNode.availableDoors
+        # iterate over available doors to select a random one and check if the target room is unvisited
+        while (card curNode.availableDoors) > 0:
 
-        # get next room
-        echo "Next Door is: ", nextDoor
+            # select a random available door to go through
+            randomize()
+            nextDoor = sample curNode.availableDoors
+            echo "Next Door is: ", nextDoor
 
-        case nextDoor:
-        of North:
-            nextNodeX = curNodeX
-            nextNodeY = curNodeY - 1
-        of East:
-            nextNodeX = curNodeX + 1
-            nextNodeY = curNodeY
-        of South:
-            nextNodeX = curNodeX
-            nextNodeY = curNodeY + 1
-        of West:
-            nextNodeX = curNodeX - 1
-            nextNodeY = curNodeY
+            # get next room
+            case nextDoor:
+            of North:
+                nextNodeX = curNodeX
+                nextNodeY = curNodeY - 1
+            of East:
+                nextNodeX = curNodeX + 1
+                nextNodeY = curNodeY
+            of South:
+                nextNodeX = curNodeX
+                nextNodeY = curNodeY + 1
+            of West:
+                nextNodeX = curNodeX - 1
+                nextNodeY = curNodeY
 
-        echo "To the " & $nextDoor & " of Room " & $curNode.posX & "/" & $curNode.posY & " lies the Room " & $nextNodeX & "/" & $nextNodeY
+            # remove the door from the list of available doors. Either we find it to be visited or we use it to visit 
+            # next room, the door should no longer be available. Also, add the specific door to list of open doors
+            excl curNode.availableDoors, nextDoor
+            incl curNode.openDoors, nextDoor
+
+            # check if the next room is unvisted. If it is already visited, then check other doors [TODO]
+            if not nodeTable.hasKey($nextNodeX & "/" & $nextNodeY):
+                echo "Found room " & $nextNodeX & "/" & $nextNodeY & " which is not yet visited"
+                break
+
+            echo "Room " & $nextNodeX & "/" & $nextNodeY & " was found to have already been visited"
+
+
+
+        echo "Moving To the Room " & $nextNodeX & "/" & $nextNodeY & " which lies to the " & $nextDoor & " of Room " & $curNode.posX & "/" & $curNode.posY
 
         # add room to output table 
         nodeTable[$curNode.posX & "/" & $curNode.posY] = curNode
 
-        # check if the next room is unvisted. If it is already visited, then check other doors [TODO]
-        if nodeTable.hasKey($nextNodeX & "/" & $nextNodeY):
-            discard
+
 
         # check if no other room is visited. then go back to previous room and repeat [TODO]
         # curNodeX = prevNodeX
@@ -92,7 +108,7 @@ proc map_generate*(rCountX: int, rCountY: int, rDoorSize: int): ListOfNodes =
 
     echo "Final state of node table is: ", $nodeTable
 
-    return map
+    return nodeTable
     # result = @[
     #     Node( posX: 1, posY: 1, isRoom : false, openDoors: @[East, South]),
     #     Node( posX: 2, posY: 1, isRoom : true,  openDoors: @[East, West]),
