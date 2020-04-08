@@ -74,23 +74,23 @@ proc mapScene_draw*(): void =
             case door:
             of South:
                 DrawRectangle(
-                    cellSize * ((node.posX - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize - (roomSquareSize div 2)),
-                    cellSize * ((node.posY - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize),
+                    cellSize * ((node.posX - 1) * (roomDoorSize + roomSquareSize) + roomDoorSize + (roomSquareSize div 2)),
+                    cellSize * ((node.posY - 1) * (roomDoorSize + roomSquareSize) + roomDoorSize + (roomSquareSize div 2) + 1),
                     cellSize,
-                    cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2) )),
+                    cellSize * (roomDoorSize + (roomSquareSize div 2) + (roomSquareSize div 2)),
                     GREEN
                 )
             of East:
                 DrawRectangle(
-                    cellSize * ((node.posX - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize),
-                    cellSize * ((node.posY - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize - (roomSquareSize div 2)),
-                    cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2))),
+                    cellSize * ((node.posX - 1) * (roomDoorSize + roomSquareSize) + roomDoorSize + (roomSquareSize div 2) + 1),
+                    cellSize * ((node.posY - 1) * (roomDoorSize + roomSquareSize) + roomDoorSize + (roomSquareSize div 2)),
+                    cellSize * (roomDoorSize + (roomSquareSize div 2) + (roomSquareSize div 2)),
                     cellSize,
                     PURPLE
                 )
             of North:
                 DrawRectangle(
-                    cellSize * ((node.posX - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize - (roomSquareSize div 2)),
+                    cellSize * ((node.posX - 1) * (roomDoorSize + roomSquareSize) + roomDoorSize + (roomSquareSize div 2)),
                     cellSize * ((node.posY - 1) * (roomDoorSize + roomSquareSize) - (roomSquareSize div 2)),
                     cellSize,
                     cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2) )),
@@ -99,7 +99,7 @@ proc mapScene_draw*(): void =
             of West:
                 DrawRectangle(
                     cellSize * ((node.posX - 1) * (roomDoorSize + roomSquareSize) - (roomSquareSize div 2)),
-                    cellSize * ((node.posY - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize - (roomSquareSize div 2)),
+                    cellSize * ((node.posY - 1) * (roomDoorSize + roomSquareSize) + roomDoorSize + (roomSquareSize div 2)),
                     cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2))),
                     cellSize,
                     PINK
