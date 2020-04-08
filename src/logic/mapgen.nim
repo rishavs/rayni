@@ -8,16 +8,14 @@ import ../defs
 proc getRandomDoor(doors: set[Directions]):Directions =
     echo doors.len
 
-proc map_generate*(rCountX: int, rCountY: int, rDoorSize: int): ListOfNodes = 
-    var map: ListOfNodes
-
+proc map_generate*(rCountX: int, rCountY: int, rDoorSize: int): TableOfNodes = 
     randomize()
     let startingNodeX   = 1
     let startingNodeY   = rand(1 .. rCountY)
     let endingNodeX     = rCountX
     let endingNodeY     = rand(1 .. rCountY)
 
-    var nodeTable = initTable[string, Node]()
+    var map = initTable[string, Node]()
 
     var curNodeX    : int   = startingNodeX
     var curNodeY    : int   = startingNodeY
@@ -30,7 +28,7 @@ proc map_generate*(rCountX: int, rCountY: int, rDoorSize: int): ListOfNodes =
         var nextNodeY   : int   = startingNodeY
 
         var nextDoor        : Directions
-        var curNode: Node = Node( posX: curNodeX, posY: curNodeY, isRoom : false, availableDoors: {North, East, South, West})
+        var curNode: Node = Node( posX: curNodeX, posY: curNodeY, isRoom: true, availableDoors: {North, East, South, West})
 
         echo "Currently Visting Room " & $curNode.posX & "/" & $curNode.posY
 
@@ -51,6 +49,11 @@ proc map_generate*(rCountX: int, rCountY: int, rDoorSize: int): ListOfNodes =
         # iterate over available doors to select a random one and check if the target room is unvisited
         while (card curNode.availableDoors) > 0:
 
+            # mark current room as starting or ending
+            if curNode.posX == startingNodeX and curNode.posY == startingNodeY:
+                curNode.isStartingRoom = true
+            elif curNode.posX == endingNodeX and curNode.posY == endingNodeY:
+                curNode.isEndingRoom = true
             # select a random available door to go through
             randomize()
             nextDoor = sample curNode.availableDoors
@@ -77,20 +80,21 @@ proc map_generate*(rCountX: int, rCountY: int, rDoorSize: int): ListOfNodes =
             incl curNode.openDoors, nextDoor
 
             # check if the next room is unvisted. If it is already visited, then check other doors [TODO]
-            if not nodeTable.hasKey($nextNodeX & "/" & $nextNodeY):
+            if not map.hasKey($nextNodeX & "/" & $nextNodeY):
                 echo "Found room " & $nextNodeX & "/" & $nextNodeY & " which is not yet visited"
                 break
 
             echo "Room " & $nextNodeX & "/" & $nextNodeY & " was found to have already been visited"
 
-
-
         echo "Moving To the Room " & $nextNodeX & "/" & $nextNodeY & " which lies to the " & $nextDoor & " of Room " & $curNode.posX & "/" & $curNode.posY
 
         # add room to output table 
-        nodeTable[$curNode.posX & "/" & $curNode.posY] = curNode
+        map[$curNode.posX & "/" & $curNode.posY] = curNode
 
-
+        # And if the openDoor count is 2, have a 50% chance for the room to be a corridor
+        if card(curNode.openDoors) == 2:
+            # curNode.isRoom =  sample @[false, true]
+            curNode.isRoom =  false
 
         # check if no other room is visited. then go back to previous room and repeat [TODO]
         # curNodeX = prevNodeX
@@ -106,9 +110,9 @@ proc map_generate*(rCountX: int, rCountY: int, rDoorSize: int): ListOfNodes =
 
         echo "------------- \n"
 
-    echo "Final state of node table is: ", $nodeTable
+    echo "Final state of node table is: ", $map
 
-    return nodeTable
+    return map
     # result = @[
     #     Node( posX: 1, posY: 1, isRoom : false, openDoors: @[East, South]),
     #     Node( posX: 2, posY: 1, isRoom : true,  openDoors: @[East, West]),

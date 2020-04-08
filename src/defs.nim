@@ -1,4 +1,5 @@
 import ../lib/raylib
+import tables
 
 #--------------------------------------------------------------------------------------
 # All global constants and data loding goes in here
@@ -9,7 +10,7 @@ const screenHeight*     = 1440
 const cellSize*         = 50
 const roomSquareSize*   = 3 # how many cells make up a room. Has to be odd
 const roomDoorSize*     = 1 # how many cells lie between 2 rooms
-const roomCountX*       = 5
+const roomCountX*       = 7
 const roomCountY*       = 5
 
 #--------------------------------------------------------------------------------------
@@ -36,11 +37,13 @@ type
     Node* = object
         posX*, posY*    : int
         isRoom*         : bool
-        isVisited*      : bool
+        isStartingRoom* : bool
+        isEndingRoom*   : bool
         openDoors*      : set[Directions]
         availableDoors* : set[Directions]
     
-    ListOfNodes* = seq[Node]
+    ListOfNodes*        = seq[Node]
+    TableOfNodes*       = Table[string, Node]
 #--------------------------------------------------------------------------------------
 # Load assets
 #--------------------------------------------------------------------------------------

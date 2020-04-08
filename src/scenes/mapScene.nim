@@ -1,18 +1,23 @@
+import tables
+
 import ../../lib/raylib
 
 import ../defs
 import ../logic/mapgen
 
-var test_node_list: ListOfNodes
+var nodeMap: TableOfNodes
 
-# const
-#     roomCellColor       = RED
-#     doorCellColor       = GREEN
-#     corridorCellColor   = YELLOW
+const
+    roomCellColor           = RED
+    doorCellColor           = GREEN
+    corridorCellColor       = YELLOW
+    startingRoomCellColor   = BLUE
+    endingRoomCellColor     = BLUE
+
 
 proc mapScene_init*(): void =
     echo "Initializing Map"
-    test_node_list = map_generate(roomCountX, roomCountY, roomDoorSize)
+    nodeMap = map_generate(roomCountX, roomCountY, roomDoorSize)
     # next step will generate cell level data from room level data using cellSize, room num and few other vars
 
 proc mapScene_update*(): void =
@@ -34,15 +39,15 @@ proc mapScene_draw*(): void =
         for j in countup(roomDoorSize * cellSize, (roomCountY * 3 * cellSize) + roomCountY * roomDoorSize * cellSize, cellSize):
             DrawLine 0, j, screenWidth, j, Fade(LIGHTGRAY, 0.6f)
     
-    for node in test_node_list:
+    for node in nodeMap.values:
         if node.isRoom == true:
             # Draw node as room
-            DrawRectangle(
+            DrawRectangleLines(
                 cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - roomSquareSize),
                 cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - roomSquareSize),
                 cellSize * (roomSquareSize),
                 cellSize * (roomSquareSize),
-                RED
+                BLUE
             )
         else:
             DrawRectangle(
@@ -50,33 +55,55 @@ proc mapScene_draw*(): void =
                 cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - (roomSquareSize - (roomSquareSize div 2))),
                 cellSize,
                 cellSize,
-                BLUE
+                RED
             )
+
+        if node.isStartingRoom == true or node.isEndingRoom == true:
+            DrawRectangle(
+                cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - (roomSquareSize - (roomSquareSize div 2))),
+                cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - (roomSquareSize - (roomSquareSize div 2))),
+                cellSize,
+                cellSize,
+                YELLOW
+            )
+
+
         # Draw open doors & Corridors. For this we will simply join the central cells
         # We only need to handle 2 directions as the door will also be open from the other side anyway
         for door in node.openDoors:
             case door:
             of South:
                 DrawRectangle(
-                    cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - (roomSquareSize - (roomSquareSize div 2))),
-                    cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - (roomSquareSize div 2)),
+                    cellSize * ((node.posX - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize - (roomSquareSize div 2)),
+                    cellSize * ((node.posY - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize),
                     cellSize,
-                    cellSize * (roomDoorSize + (roomSquareSize )),
-                    RED
+                    cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2) )),
+                    GREEN
                 )
             of East:
-                discard
                 DrawRectangle(
-                    cellSize * ((node.posX * (roomDoorSize + roomSquareSize)) - (roomSquareSize div 2)),
-                    cellSize * ((node.posY * (roomDoorSize + roomSquareSize)) - (roomSquareSize - (roomSquareSize div 2))),
-                    cellSize * (roomDoorSize + (roomSquareSize)),
+                    cellSize * ((node.posX - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize),
+                    cellSize * ((node.posY - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize - (roomSquareSize div 2)),
+                    cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2))),
                     cellSize,
-                    RED
+                    PURPLE
                 )
             of North:
-                discard
+                DrawRectangle(
+                    cellSize * ((node.posX - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize - (roomSquareSize div 2)),
+                    cellSize * ((node.posY - 1) * (roomDoorSize + roomSquareSize) - (roomSquareSize div 2)),
+                    cellSize,
+                    cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2) )),
+                    RED
+                )
             of West:
-                discard
+                DrawRectangle(
+                    cellSize * ((node.posX - 1) * (roomDoorSize + roomSquareSize) - (roomSquareSize div 2)),
+                    cellSize * ((node.posY - 1) * (roomDoorSize + roomSquareSize) + roomSquareSize - (roomSquareSize div 2)),
+                    cellSize * (roomDoorSize + (roomSquareSize - (roomSquareSize div 2))),
+                    cellSize,
+                    PINK
+                )
 
 
     DrawText "FPS: "    & $GetFPS(),        10, 10, 20, BLUE
